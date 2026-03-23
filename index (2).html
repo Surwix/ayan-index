@@ -1,0 +1,816 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Ayan — Building things with AI</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #f7f6f2;
+    --ink: #181816;
+    --muted: #8a897f;
+    --soft: #eceae3;
+    --border: #dddbd2;
+    --accent: #d4f06e;
+    --white: #ffffff;
+    --radius: 14px;
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: 'Jost', sans-serif;
+    font-size: 15px;
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  main { max-width: 800px; margin: 0 auto; padding: 0 24px 120px; }
+
+  /* ── CONTACTS BAR ── */
+  .contacts-bar {
+    background: var(--ink);
+    color: var(--bg);
+    padding: 10px 0;
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.03em;
+  }
+  .contacts-bar-inner {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 0 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .contacts-bar-name { font-weight: 700; letter-spacing: 0.05em; opacity: 0.7; font-size: 11px; text-transform: uppercase; }
+  .contacts-links { display: flex; gap: 20px; align-items: center; flex-wrap: wrap; }
+  .contacts-links a {
+    color: rgba(247,246,242,0.7);
+    text-decoration: none;
+    transition: color 0.18s;
+  }
+  .contacts-links a:hover { color: var(--accent); }
+
+  /* ── HERO ── */
+  .hero { padding: 56px 0 44px; animation: fadeUp 0.65s ease both; }
+  .hero-inner { display: grid; grid-template-columns: auto 1fr; gap: 32px; align-items: start; }
+
+  .avatar-wrap {
+    width: 88px; height: 88px; border-radius: 50%;
+    border: 2px solid var(--border); background: var(--soft);
+    overflow: hidden; cursor: pointer; transition: transform 0.25s ease, border-color 0.25s;
+    flex-shrink: 0;
+  }
+  .avatar-wrap:hover { transform: scale(1.06) rotate(-2deg); border-color: var(--ink); }
+  .avatar-wrap img { width: 100%; height: 100%; object-fit: cover; }
+  .avatar-placeholder {
+    width: 100%; height: 100%; display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    color: var(--muted); font-size: 11px; font-weight: 500;
+    letter-spacing: 0.04em; text-transform: uppercase; gap: 3px;
+  }
+  .avatar-placeholder svg { opacity: 0.35; }
+  input[type=file] { display: none; }
+
+  .eyebrow { font-size: 11px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); margin-bottom: 14px; }
+
+  h1 {
+    font-family: 'Lora', serif;
+    font-size: clamp(28px, 5vw, 42px);
+    font-weight: 700; line-height: 1.12;
+    letter-spacing: -0.02em; margin-bottom: 16px;
+  }
+  h1 em { font-style: italic; font-weight: 400; }
+  h1 .underline { position: relative; display: inline-block; }
+  h1 .underline::after {
+    content: ''; position: absolute;
+    left: 0; bottom: 2px; right: 0; height: 3px;
+    background: var(--accent); border-radius: 2px;
+  }
+
+  .bio { color: var(--muted); font-size: 14px; line-height: 1.8; max-width: 440px; }
+  .bio strong { color: var(--ink); font-weight: 600; }
+
+  .stats { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 24px; animation: fadeUp 0.65s 0.1s ease both; }
+  .stat { background: var(--soft); border: 1px solid var(--border); border-radius: 8px; padding: 7px 14px; font-size: 12px; font-weight: 600; color: var(--muted); }
+  .stat span { color: var(--ink); }
+
+  .divider { border: none; border-top: 1px solid var(--border); margin: 36px 0 26px; }
+
+  /* ── SECTION HEAD ── */
+  .section-head {
+    display: flex; align-items: center; justify-content: space-between;
+    flex-wrap: wrap; gap: 12px; margin-bottom: 18px;
+    animation: fadeUp 0.65s 0.15s ease both;
+  }
+  .section-label { font-size: 11px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); }
+  .filters { display: flex; gap: 6px; flex-wrap: wrap; }
+  .filter-btn {
+    background: var(--soft); border: 1px solid var(--border); border-radius: 100px;
+    padding: 5px 15px; font-family: 'Jost', sans-serif; font-size: 12px; font-weight: 600;
+    cursor: pointer; color: var(--muted); transition: all 0.18s; letter-spacing: 0.02em;
+  }
+  .filter-btn:hover { border-color: var(--ink); color: var(--ink); }
+  .filter-btn.active { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+
+  /* ── GRID ── */
+  .projects { display: grid; grid-template-columns: repeat(auto-fill, minmax(270px, 1fr)); gap: 12px; animation: fadeUp 0.65s 0.2s ease both; }
+
+  .card {
+    background: var(--white); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 22px;
+    display: flex; flex-direction: column; gap: 12px;
+    transition: transform 0.22s ease, box-shadow 0.22s ease;
+    position: relative; overflow: hidden;
+  }
+  .card::after {
+    content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 2px;
+    background: var(--accent); transform: scaleX(0); transform-origin: left; transition: transform 0.25s ease;
+  }
+  .card:hover { transform: translateY(-3px); box-shadow: 0 8px 28px rgba(0,0,0,0.07); }
+  .card:hover::after { transform: scaleX(1); }
+  .card.hidden { display: none; }
+
+  .card-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; }
+
+  .status-pill { font-size: 9px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; padding: 3px 10px; border-radius: 100px; white-space: nowrap; flex-shrink: 0; margin-top: 2px; }
+  .pill-idea { background: #ece8ff; color: #5b4fcf; }
+  .pill-wip  { background: #fff4d6; color: #8c6200; }
+  .pill-live { background: #ddfbd0; color: #2d7a16; }
+  .pill-done { background: #f0f0ee; color: #777; }
+
+  .card-title { font-family: 'Lora', serif; font-size: 17px; font-weight: 600; line-height: 1.25; letter-spacing: -0.01em; }
+  .card-desc { font-size: 13px; color: var(--muted); line-height: 1.7; flex: 1; }
+
+  .card-footer {
+    display: flex; align-items: center; justify-content: space-between;
+    flex-wrap: wrap; gap: 8px; padding-top: 10px; border-top: 1px solid var(--soft);
+  }
+  .card-tags { display: flex; gap: 5px; flex-wrap: wrap; }
+  .tag { font-size: 10px; font-weight: 600; padding: 2px 9px; border-radius: 100px; background: var(--soft); color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; }
+
+  .card-link {
+    font-size: 11px; font-weight: 600; color: var(--ink); text-decoration: none;
+    letter-spacing: 0.04em; display: inline-flex; align-items: center; gap: 3px;
+    padding: 5px 13px; border: 1px solid var(--border); border-radius: 100px;
+    transition: background 0.18s, border-color 0.18s, color 0.18s; white-space: nowrap;
+  }
+  .card-link:hover { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+
+  /* Admin edit button on card */
+  .card-edit-btn {
+    position: absolute; top: 10px; right: 10px;
+    background: var(--soft); border: 1px solid var(--border);
+    border-radius: 8px; padding: 4px 10px;
+    font-family: 'Jost', sans-serif; font-size: 11px; font-weight: 600;
+    cursor: pointer; color: var(--muted); display: none; transition: all 0.18s;
+    z-index: 2;
+  }
+  .card-edit-btn:hover { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+  body.admin-mode .card-edit-btn { display: block; }
+  body.admin-mode .card:hover::after { transform: none; }
+
+  /* ── SHOW MORE ── */
+  .show-more-wrap { text-align: center; margin-top: 18px; }
+  #showMoreBtn {
+    background: transparent; border: 1px solid var(--border); border-radius: 100px;
+    padding: 9px 28px; font-family: 'Jost', sans-serif; font-size: 13px; font-weight: 600;
+    cursor: pointer; color: var(--muted); letter-spacing: 0.03em; transition: all 0.18s;
+  }
+  #showMoreBtn:hover { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+
+  /* ── ADMIN BAR ── */
+  .admin-bar {
+    position: fixed; bottom: 0; left: 0; right: 0;
+    background: var(--ink); color: var(--bg);
+    padding: 12px 24px; display: none;
+    align-items: center; justify-content: space-between;
+    gap: 12px; z-index: 100; flex-wrap: wrap;
+  }
+  .admin-bar.visible { display: flex; }
+  .admin-bar-left { font-size: 12px; font-weight: 600; letter-spacing: 0.04em; opacity: 0.6; }
+  .admin-bar-right { display: flex; gap: 10px; flex-wrap: wrap; }
+
+  .btn-admin {
+    background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 100px; padding: 7px 18px;
+    font-family: 'Jost', sans-serif; font-size: 12px; font-weight: 600;
+    cursor: pointer; color: var(--bg); transition: all 0.18s; letter-spacing: 0.03em;
+  }
+  .btn-admin:hover { background: rgba(255,255,255,0.2); }
+  .btn-admin.primary { background: var(--accent); color: var(--ink); border-color: var(--accent); }
+  .btn-admin.primary:hover { opacity: 0.9; }
+  .btn-admin.danger { background: rgba(255,80,80,0.15); border-color: rgba(255,80,80,0.3); color: #ff8080; }
+  .btn-admin.danger:hover { background: rgba(255,80,80,0.3); }
+
+  /* ── ADMIN TOGGLE (gear icon top right) ── */
+  .admin-toggle {
+    position: fixed; top: 16px; right: 16px;
+    background: var(--white); border: 1px solid var(--border);
+    border-radius: 100px; padding: 6px 14px;
+    font-family: 'Jost', sans-serif; font-size: 11px; font-weight: 600;
+    cursor: pointer; color: var(--muted); z-index: 50;
+    transition: all 0.18s; letter-spacing: 0.04em;
+  }
+  .admin-toggle:hover { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+
+  /* ── MODAL ── */
+  .modal-overlay {
+    position: fixed; inset: 0; background: rgba(24,24,22,0.6);
+    display: none; align-items: center; justify-content: center;
+    z-index: 200; padding: 20px; backdrop-filter: blur(4px);
+  }
+  .modal-overlay.open { display: flex; }
+
+  .modal {
+    background: var(--white); border-radius: 20px;
+    padding: 32px; width: 100%; max-width: 480px;
+    max-height: 90vh; overflow-y: auto;
+    animation: modalIn 0.25s ease;
+  }
+  @keyframes modalIn { from { opacity:0; transform:translateY(12px) scale(0.97); } to { opacity:1; transform:none; } }
+
+  .modal h2 { font-family: 'Lora', serif; font-size: 22px; font-weight: 700; margin-bottom: 24px; }
+
+  .form-group { margin-bottom: 18px; }
+  .form-group label { display: block; font-size: 11px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); margin-bottom: 6px; }
+
+  .form-group input,
+  .form-group textarea,
+  .form-group select {
+    width: 100%; padding: 10px 14px;
+    background: var(--bg); border: 1.5px solid var(--border);
+    border-radius: 10px; font-family: 'Jost', sans-serif;
+    font-size: 14px; color: var(--ink); outline: none;
+    transition: border-color 0.18s;
+  }
+  .form-group input:focus,
+  .form-group textarea:focus,
+  .form-group select:focus { border-color: var(--ink); }
+  .form-group textarea { resize: vertical; min-height: 80px; }
+
+  .modal-actions { display: flex; gap: 10px; margin-top: 24px; justify-content: flex-end; }
+  .btn-cancel { background: var(--soft); border: 1px solid var(--border); border-radius: 100px; padding: 9px 20px; font-family: 'Jost', sans-serif; font-size: 13px; font-weight: 600; cursor: pointer; color: var(--muted); transition: all 0.18s; }
+  .btn-cancel:hover { color: var(--ink); border-color: var(--ink); }
+  .btn-save { background: var(--ink); border: none; border-radius: 100px; padding: 9px 24px; font-family: 'Jost', sans-serif; font-size: 13px; font-weight: 600; cursor: pointer; color: var(--bg); transition: opacity 0.18s; }
+  .btn-save:hover { opacity: 0.85; }
+  .btn-delete { background: #fff0f0; border: 1px solid #ffd0d0; border-radius: 100px; padding: 9px 20px; font-family: 'Jost', sans-serif; font-size: 13px; font-weight: 600; cursor: pointer; color: #c0392b; transition: all 0.18s; }
+  .btn-delete:hover { background: #ffe0e0; }
+
+  /* Password modal */
+  .pw-hint { font-size: 12px; color: var(--muted); margin-top: 6px; }
+  .pw-error { font-size: 12px; color: #c0392b; margin-top: 6px; display: none; }
+
+  /* ── FOOTER ── */
+  footer { margin-top: 64px; padding-top: 24px; border-top: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; font-size: 12px; color: var(--muted); flex-wrap: wrap; gap: 12px; }
+  .footer-links { display: flex; gap: 20px; }
+  .footer-links a { color: var(--muted); text-decoration: none; font-weight: 500; transition: color 0.18s; }
+  .footer-links a:hover { color: var(--ink); }
+
+  @keyframes fadeUp { from { opacity:0; transform:translateY(14px); } to { opacity:1; transform:none; } }
+
+  @media (max-width: 520px) {
+    .hero-inner { grid-template-columns: 1fr; }
+    .projects { grid-template-columns: 1fr; }
+    footer { flex-direction: column; text-align: center; }
+    .section-head { flex-direction: column; align-items: flex-start; }
+    .contacts-bar-inner { flex-direction: column; align-items: flex-start; gap: 6px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- CONTACTS BAR -->
+<div class="contacts-bar">
+  <div class="contacts-bar-inner">
+    <span class="contacts-bar-name" id="barName">Ayan</span>
+    <div class="contacts-links" id="barLinks">
+      <a href="mailto:you@email.com" id="barEmail">you@email.com</a>
+      <a href="#" id="barLinkedIn" target="_blank">LinkedIn</a>
+      <a href="#" id="barGitHub" target="_blank">GitHub</a>
+      <a href="#" id="barTwitter" target="_blank" style="display:none">Twitter</a>
+    </div>
+  </div>
+</div>
+
+<!-- ADMIN TOGGLE -->
+<button class="admin-toggle" id="adminToggle">Admin</button>
+
+<main>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-inner">
+      <div class="avatar-wrap" id="avatarWrap" title="Click to upload photo">
+        <img id="avatarImg" alt="Ayan" style="display:none" />
+        <div class="avatar-placeholder" id="avatarPlaceholder">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/>
+          </svg>
+          <span>photo</span>
+        </div>
+        <input type="file" id="avatarInput" accept="image/*" onchange="loadAvatar(event)" />
+      </div>
+
+      <div class="hero-text">
+        <p class="eyebrow" id="heroLocation">Ohio, USA</p>
+        <h1 id="heroTitle">Hi, I'm Ayan.<br>I build <span class="underline">things</span> with AI<br><em>as a hobby.</em></h1>
+        <p class="bio" id="heroBio">
+          Not a startup founder with a pitch deck —
+          just a <strong>person with too many ideas</strong> and AI as a co-pilot.<br>
+          This is where my experiments live. Some will go somewhere. Most won't. That's kind of the point.
+        </p>
+      </div>
+    </div>
+
+    <div class="stats">
+      <div class="stat"><span id="ideaCount">0</span> ideas</div>
+      <div class="stat"><span id="wipCount">0</span> in progress</div>
+      <div class="stat"><span id="liveCount">0</span> live</div>
+      <div class="stat">Built with AI</div>
+    </div>
+  </section>
+
+  <hr class="divider" />
+
+  <div class="section-head">
+    <span class="section-label">Projects</span>
+    <div class="filters">
+      <button class="filter-btn active" data-filter="all">All</button>
+      <button class="filter-btn" data-filter="live">Live</button>
+      <button class="filter-btn" data-filter="wip">In Progress</button>
+      <button class="filter-btn" data-filter="idea">Ideas</button>
+      <button class="filter-btn" data-filter="done">Done</button>
+    </div>
+  </div>
+
+  <div class="projects" id="projectsGrid"></div>
+
+  <div class="show-more-wrap">
+    <button id="showMoreBtn">Show more</button>
+  </div>
+
+  <footer>
+    <span>Made with AI &middot; 2026</span>
+    <div class="footer-links" id="footerLinks">
+      <a href="mailto:you@email.com" id="footerEmail">Email</a>
+      <a href="#" id="footerLinkedIn">LinkedIn</a>
+      <a href="#" id="footerGitHub">GitHub</a>
+    </div>
+  </footer>
+
+</main>
+
+<!-- ADMIN BAR -->
+<div class="admin-bar" id="adminBar">
+  <span class="admin-bar-left">Admin Mode</span>
+  <div class="admin-bar-right">
+    <button class="btn-admin" onclick="openProfileModal()">Edit Profile</button>
+    <button class="btn-admin" onclick="openContactsModal()">Edit Contacts</button>
+    <button class="btn-admin primary" onclick="openProjectModal()">+ Add Project</button>
+    <button class="btn-admin danger" onclick="exitAdmin()">Exit</button>
+  </div>
+</div>
+
+<!-- PASSWORD MODAL -->
+<div class="modal-overlay" id="pwModal">
+  <div class="modal">
+    <h2>Admin Access</h2>
+    <div class="form-group">
+      <label>Password</label>
+      <input type="password" id="pwInput" placeholder="Enter password" onkeydown="if(event.key==='Enter')checkPw()" />
+      <p class="pw-hint">Default password: <strong>admin123</strong> — change it inside after logging in.</p>
+      <p class="pw-error" id="pwError">Wrong password. Try again.</p>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeModal('pwModal')">Cancel</button>
+      <button class="btn-save" onclick="checkPw()">Enter</button>
+    </div>
+  </div>
+</div>
+
+<!-- PROJECT MODAL -->
+<div class="modal-overlay" id="projectModal">
+  <div class="modal">
+    <h2 id="projectModalTitle">Add Project</h2>
+    <input type="hidden" id="editingId" value="" />
+    <div class="form-group">
+      <label>Title</label>
+      <input type="text" id="pTitle" placeholder="Mars Registry" />
+    </div>
+    <div class="form-group">
+      <label>Description</label>
+      <textarea id="pDesc" placeholder="Short description, 1-2 sentences."></textarea>
+    </div>
+    <div class="form-group">
+      <label>Status</label>
+      <select id="pStatus">
+        <option value="idea">Idea</option>
+        <option value="wip">In Progress</option>
+        <option value="live">Live</option>
+        <option value="done">Done</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label>Tags (comma separated)</label>
+      <input type="text" id="pTags" placeholder="AI, Space, Maps" />
+    </div>
+    <div class="form-group">
+      <label>Link URL</label>
+      <input type="text" id="pLink" placeholder="https://..." />
+    </div>
+    <div class="modal-actions">
+      <button class="btn-delete" id="deleteBtn" onclick="deleteProject()" style="display:none">Delete</button>
+      <button class="btn-cancel" onclick="closeModal('projectModal')">Cancel</button>
+      <button class="btn-save" onclick="saveProject()">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- PROFILE MODAL -->
+<div class="modal-overlay" id="profileModal">
+  <div class="modal">
+    <h2>Edit Profile</h2>
+    <div class="form-group">
+      <label>Your Name</label>
+      <input type="text" id="profName" placeholder="Ayan" />
+    </div>
+    <div class="form-group">
+      <label>Location</label>
+      <input type="text" id="profLocation" placeholder="Ohio, USA" />
+    </div>
+    <div class="form-group">
+      <label>Bio (HTML allowed: use &lt;strong&gt; for bold)</label>
+      <textarea id="profBio" style="min-height:120px"></textarea>
+    </div>
+    <div class="form-group">
+      <label>Admin Password</label>
+      <input type="password" id="profPw" placeholder="Change password (leave blank to keep)" />
+    </div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeModal('profileModal')">Cancel</button>
+      <button class="btn-save" onclick="saveProfile()">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- CONTACTS MODAL -->
+<div class="modal-overlay" id="contactsModal">
+  <div class="modal">
+    <h2>Edit Contacts</h2>
+    <div class="form-group">
+      <label>Email</label>
+      <input type="text" id="cEmail" placeholder="you@email.com" />
+    </div>
+    <div class="form-group">
+      <label>LinkedIn URL</label>
+      <input type="text" id="cLinkedIn" placeholder="https://linkedin.com/in/..." />
+    </div>
+    <div class="form-group">
+      <label>GitHub URL</label>
+      <input type="text" id="cGitHub" placeholder="https://github.com/..." />
+    </div>
+    <div class="form-group">
+      <label>Twitter / X URL (leave blank to hide)</label>
+      <input type="text" id="cTwitter" placeholder="https://x.com/..." />
+    </div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeModal('contactsModal')">Cancel</button>
+      <button class="btn-save" onclick="saveContacts()">Save</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════
+// DATA
+// ═══════════════════════════════════
+const STORAGE_KEY = 'ayan_portfolio';
+
+const DEFAULTS = {
+  password: 'admin123',
+  profile: {
+    name: 'Ayan',
+    location: 'Ohio, USA',
+    bio: 'Not a startup founder with a pitch deck — just a <strong>person with too many ideas</strong> and AI as a co-pilot.<br>This is where my experiments live. Some will go somewhere. Most won\'t. That\'s kind of the point.',
+  },
+  contacts: {
+    email: 'you@email.com',
+    linkedin: '#',
+    github: '#',
+    twitter: '',
+  },
+  projects: [
+    { id: 1, title: 'Mars Registry', desc: 'Claim a plot on Mars using NASA map data, get a "Mars citizenship" passport, join a community of future Martians. Waiting for Elon to catch up.', status: 'wip', tags: ['Space','Maps','Community'], link: '#' },
+    { id: 2, title: 'Personalized Film Endings', desc: 'AI picks your movie ending based on your psychographic profile. Optimists get tragedy. Sad people get happy endings. Everyone gets surprised.', status: 'idea', tags: ['AI','Streaming'], link: '#' },
+    { id: 3, title: 'Truck Repair Hub', desc: 'Find a decent truck mechanic without overpaying. I spent years in trucking — I know exactly how broken this is.', status: 'idea', tags: ['Trucking','Local'], link: '#' },
+  ]
+};
+
+function loadData() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    return raw ? JSON.parse(raw) : JSON.parse(JSON.stringify(DEFAULTS));
+  } catch(e) { return JSON.parse(JSON.stringify(DEFAULTS)); }
+}
+
+function saveData(data) {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+}
+
+let DATA = loadData();
+
+// ═══════════════════════════════════
+// RENDER
+// ═══════════════════════════════════
+const CHUNK = 6;
+let visible = CHUNK;
+let currentFilter = 'all';
+
+function getFiltered() {
+  return currentFilter === 'all'
+    ? DATA.projects
+    : DATA.projects.filter(p => p.status === currentFilter);
+}
+
+const pillMap = { idea: 'pill-idea', wip: 'pill-wip', live: 'pill-live', done: 'pill-done' };
+const labelMap = { idea: 'Idea', wip: 'In Progress', live: 'Live', done: 'Done' };
+
+function renderCard(p) {
+  const tags = (p.tags || []).map(t => `<span class="tag">${t}</span>`).join('');
+  const linkHref = p.link && p.link !== '#' ? p.link : '#';
+  const linkTarget = p.link && p.link !== '#' ? 'target="_blank"' : '';
+  return `
+    <div class="card" data-id="${p.id}" data-status="${p.status}">
+      <button class="card-edit-btn" onclick="openProjectModal(${p.id})">Edit</button>
+      <div class="card-header">
+        <div class="card-title">${p.title}</div>
+        <span class="status-pill ${pillMap[p.status]}">${labelMap[p.status]}</span>
+      </div>
+      <p class="card-desc">${p.desc}</p>
+      <div class="card-footer">
+        <div class="card-tags">${tags}</div>
+        ${linkHref !== '#' ? `<a href="${linkHref}" ${linkTarget} class="card-link">View</a>` : ''}
+      </div>
+    </div>`;
+}
+
+function renderProjects() {
+  const filtered = getFiltered();
+  const grid = document.getElementById('projectsGrid');
+  grid.innerHTML = filtered.slice(0, visible).map(renderCard).join('');
+
+  const btn = document.getElementById('showMoreBtn');
+  const remaining = filtered.length - visible;
+  if (remaining <= 0) { btn.style.display = 'none'; }
+  else { btn.style.display = 'inline-block'; btn.textContent = `Show more (${remaining} left)`; }
+
+  // Stats
+  const counts = { idea: 0, wip: 0, live: 0 };
+  DATA.projects.forEach(p => { if (counts[p.status] !== undefined) counts[p.status]++; });
+  document.getElementById('ideaCount').textContent = counts.idea;
+  document.getElementById('wipCount').textContent = counts.wip;
+  document.getElementById('liveCount').textContent = counts.live;
+}
+
+function renderProfile() {
+  const p = DATA.profile;
+  const c = DATA.contacts;
+  document.getElementById('heroLocation').textContent = p.location;
+  document.getElementById('heroBio').innerHTML = p.bio;
+  document.getElementById('heroTitle').innerHTML = `Hi, I'm ${p.name}.<br>I build <span class="underline">things</span> with AI<br><em>as a hobby.</em>`;
+  document.title = `${p.name} — Building things with AI`;
+  document.getElementById('barName').textContent = p.name;
+
+  // contacts bar
+  const email = c.email || '';
+  const li = c.linkedin || '#';
+  const gh = c.github || '#';
+  const tw = c.twitter || '';
+
+  document.getElementById('barEmail').textContent = email;
+  document.getElementById('barEmail').href = 'mailto:' + email;
+  document.getElementById('barLinkedIn').href = li;
+  document.getElementById('barGitHub').href = gh;
+  document.getElementById('barTwitter').href = tw;
+  document.getElementById('barTwitter').style.display = tw ? 'inline' : 'none';
+
+  document.getElementById('footerEmail').href = 'mailto:' + email;
+  document.getElementById('footerLinkedIn').href = li;
+  document.getElementById('footerGitHub').href = gh;
+}
+
+function init() {
+  renderProfile();
+  renderProjects();
+
+  // Avatar
+  const saved = localStorage.getItem('ayan_avatar');
+  if (saved) setAvatar(saved);
+
+  // Show more
+  document.getElementById('showMoreBtn').addEventListener('click', () => {
+    visible += CHUNK;
+    renderProjects();
+  });
+
+  // Filters
+  document.querySelectorAll('.filter-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      currentFilter = btn.dataset.filter;
+      visible = CHUNK;
+      renderProjects();
+    });
+  });
+
+  // Admin toggle
+  document.getElementById('adminToggle').addEventListener('click', () => {
+    if (document.body.classList.contains('admin-mode')) {
+      exitAdmin();
+    } else {
+      openModal('pwModal');
+      setTimeout(() => document.getElementById('pwInput').focus(), 100);
+    }
+  });
+
+  // Avatar click only in admin mode
+  document.getElementById('avatarWrap').addEventListener('click', () => {
+    if (document.body.classList.contains('admin-mode')) {
+      document.getElementById('avatarInput').click();
+    }
+  });
+}
+
+// ═══════════════════════════════════
+// ADMIN
+// ═══════════════════════════════════
+function checkPw() {
+  const val = document.getElementById('pwInput').value;
+  if (val === DATA.password) {
+    document.getElementById('pwError').style.display = 'none';
+    document.getElementById('pwInput').value = '';
+    closeModal('pwModal');
+    enterAdmin();
+  } else {
+    document.getElementById('pwError').style.display = 'block';
+  }
+}
+
+function enterAdmin() {
+  document.body.classList.add('admin-mode');
+  document.getElementById('adminBar').classList.add('visible');
+  document.getElementById('adminToggle').textContent = 'Exit Admin';
+  renderProjects();
+}
+
+function exitAdmin() {
+  document.body.classList.remove('admin-mode');
+  document.getElementById('adminBar').classList.remove('visible');
+  document.getElementById('adminToggle').textContent = 'Admin';
+  renderProjects();
+}
+
+// ═══════════════════════════════════
+// MODALS
+// ═══════════════════════════════════
+function openModal(id) { document.getElementById(id).classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+
+// Close on overlay click
+document.querySelectorAll('.modal-overlay').forEach(el => {
+  el.addEventListener('click', e => { if (e.target === el) el.classList.remove('open'); });
+});
+
+// PROJECT MODAL
+function openProjectModal(id) {
+  document.getElementById('projectModalTitle').textContent = id ? 'Edit Project' : 'Add Project';
+  document.getElementById('deleteBtn').style.display = id ? 'inline-block' : 'none';
+  document.getElementById('editingId').value = id || '';
+
+  if (id) {
+    const p = DATA.projects.find(x => x.id === id);
+    if (!p) return;
+    document.getElementById('pTitle').value = p.title;
+    document.getElementById('pDesc').value = p.desc;
+    document.getElementById('pStatus').value = p.status;
+    document.getElementById('pTags').value = (p.tags || []).join(', ');
+    document.getElementById('pLink').value = p.link || '';
+  } else {
+    document.getElementById('pTitle').value = '';
+    document.getElementById('pDesc').value = '';
+    document.getElementById('pStatus').value = 'idea';
+    document.getElementById('pTags').value = '';
+    document.getElementById('pLink').value = '';
+  }
+  openModal('projectModal');
+}
+
+function saveProject() {
+  const id = document.getElementById('editingId').value;
+  const title = document.getElementById('pTitle').value.trim();
+  if (!title) { alert('Title is required'); return; }
+
+  const proj = {
+    id: id ? parseInt(id) : Date.now(),
+    title,
+    desc: document.getElementById('pDesc').value.trim(),
+    status: document.getElementById('pStatus').value,
+    tags: document.getElementById('pTags').value.split(',').map(t => t.trim()).filter(Boolean),
+    link: document.getElementById('pLink').value.trim() || '#',
+  };
+
+  if (id) {
+    const idx = DATA.projects.findIndex(p => p.id === parseInt(id));
+    if (idx > -1) DATA.projects[idx] = proj;
+  } else {
+    DATA.projects.unshift(proj);
+  }
+
+  saveData(DATA);
+  closeModal('projectModal');
+  renderProjects();
+}
+
+function deleteProject() {
+  const id = parseInt(document.getElementById('editingId').value);
+  if (!confirm('Delete this project?')) return;
+  DATA.projects = DATA.projects.filter(p => p.id !== id);
+  saveData(DATA);
+  closeModal('projectModal');
+  renderProjects();
+}
+
+// PROFILE MODAL
+function openProfileModal() {
+  document.getElementById('profName').value = DATA.profile.name;
+  document.getElementById('profLocation').value = DATA.profile.location;
+  document.getElementById('profBio').value = DATA.profile.bio;
+  document.getElementById('profPw').value = '';
+  openModal('profileModal');
+}
+
+function saveProfile() {
+  DATA.profile.name = document.getElementById('profName').value.trim() || 'Ayan';
+  DATA.profile.location = document.getElementById('profLocation').value.trim();
+  DATA.profile.bio = document.getElementById('profBio').value.trim();
+  const newPw = document.getElementById('profPw').value;
+  if (newPw) DATA.password = newPw;
+  saveData(DATA);
+  renderProfile();
+  closeModal('profileModal');
+}
+
+// CONTACTS MODAL
+function openContactsModal() {
+  document.getElementById('cEmail').value = DATA.contacts.email;
+  document.getElementById('cLinkedIn').value = DATA.contacts.linkedin;
+  document.getElementById('cGitHub').value = DATA.contacts.github;
+  document.getElementById('cTwitter').value = DATA.contacts.twitter || '';
+  openModal('contactsModal');
+}
+
+function saveContacts() {
+  DATA.contacts.email = document.getElementById('cEmail').value.trim();
+  DATA.contacts.linkedin = document.getElementById('cLinkedIn').value.trim() || '#';
+  DATA.contacts.github = document.getElementById('cGitHub').value.trim() || '#';
+  DATA.contacts.twitter = document.getElementById('cTwitter').value.trim();
+  saveData(DATA);
+  renderProfile();
+  closeModal('contactsModal');
+}
+
+// ═══════════════════════════════════
+// AVATAR
+// ═══════════════════════════════════
+function setAvatar(src) {
+  const img = document.getElementById('avatarImg');
+  img.src = src;
+  img.style.display = 'block';
+  document.getElementById('avatarPlaceholder').style.display = 'none';
+}
+
+function loadAvatar(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    setAvatar(ev.target.result);
+    try { localStorage.setItem('ayan_avatar', ev.target.result); } catch(e) {}
+  };
+  reader.readAsDataURL(file);
+}
+
+init();
+</script>
+</body>
+</html>
